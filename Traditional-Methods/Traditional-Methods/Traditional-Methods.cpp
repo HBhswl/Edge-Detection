@@ -1,6 +1,10 @@
 ﻿#include <iostream>
+
 #include "Operator.h"
 #include "utils.h"
+#include "MySobel.h"
+#include "MyCanny.h"
+
 #include <core/core.hpp>
 #include <highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
@@ -12,19 +16,34 @@ int main()
 {
 	Utils utils;
 	Operator o;
+	MySobel mysobel;
 
-	Mat img = imread("C:\\Users\\lenovo\\Desktop\\lena.png");
-	// imshow("img", img);
+	Mat img = imread("lena.png");
 	Mat Gray = utils.Rgb2Gray(img);
-	// imshow("Gray", Gray);
 	Mat dst;
 	resize(Gray, dst, Size(256, 256));
-	// imshow("dst", dst);
+
+	double threshold1 = 100;
+	double threshold2 = 200;
 	// ========================================
-	//             OpenCv
+	//             MyCanny
 	// ========================================
-	
-	
+	MyCanny mycanny(dst, threshold1, threshold2);
+	Mat mycannyresult;
+	mycannyresult = utils.Vec2Mat(mycanny.getresult(), 256, 256);
+	imshow("Mycanny", mycannyresult);
+
+	// ========================================
+	//             OpenCv Canny
+	// ========================================
+
+	Mat opencvcanny;
+	Canny(dst, opencvcanny, threshold1, threshold2);
+	imshow("OpencvCanny", opencvcanny);
+
+	// ========================================
+	//             OpenCv Sobel
+	// ========================================
 	Mat grad_x, grad_y, opencvsobel;
 	Mat abs_grad_x, abs_grad_y;
 
@@ -37,23 +56,14 @@ int main()
 	addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, opencvsobel);
 	imshow("OpencvSobel", opencvsobel);
 	
-
-	int input[256 * 256] = { 0 };
-	int outputx[256 * 256] = { 0 };
-	int outputy[256 * 256] = { 0 };
-	int output[256 * 256] = { 0 };
-	utils.Mat2Vec(dst, input);
-	
-	o.df(input, o.Sobel_x, outputx, 256, 256);
-	o.df(input, o.Sobel_y, outputy, 256, 256);
-
-	// utils.SumAbs(outputx, outputy, output, 256 * 256);
-	utils.SumPowSqrt(outputx, outputy, output, 256 * 256);
-
-	utils.Normalize(output, 256 * 256);
-	Mat sobel = utils.Vec2Mat(output, 256, 256);
-	imshow("MySobel", sobel);
+	// ========================================
+	//             MySobel
+	// ========================================
+	Mat mysobelreuslt;
+	mysobelreuslt = mysobel.sobel_x(dst);
+	mysobelreuslt = mysobel.sobel_y(dst);
+	mysobelreuslt = mysobel.sobel(dst);
+	imshow("MySobel", mysobelreuslt);
 	waitKey(0);
-
 	return 0;
 }

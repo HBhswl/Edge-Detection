@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <math.h>
+#include <iostream>
 
 cv::Mat Utils::Rgb2Gray(cv::Mat img)
 {
@@ -33,6 +34,16 @@ cv::Mat Utils::Vec2Mat(int* vec, int rows, int cols) {
 	return Gray;
 }
 
+cv::Mat Utils::Vec2Mat(double* vec, int rows, int cols) {
+	cv::Mat Gray(rows, cols, CV_8U, cv::Scalar(0));
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			Gray.at<uchar>(i, j) = (int)vec[i * cols + j];
+		}
+	}
+	return Gray;
+}
+
 void Utils::SumAbs(int* vec1, int* vec2, int* vec3, int size) {
 	for (int i = 0; i < size; i ++) {
 		vec3[i] = abs(vec1[i]) + abs(vec2[i]);
@@ -56,5 +67,11 @@ void Utils::Normalize(int* vec, int size) {
 	}
 	for (int i = 0; i < size; i++) {
 		vec[i] = (int)(255.0 * (((double)vec[i] - (double)min) / (double)max));
+	}
+}
+
+void Utils::actan(int* vec1, int* vec2, double* vec3, int size) {
+	for (int i = 0; i < size; i++) {
+		vec3[i] = atan2((double)vec2[i], (double)vec1[i]);
 	}
 }
